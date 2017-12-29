@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 {
     int opt;
     bool opt_shell = false;
-    while ((opt = getopt(argc, argv, "sh")) != -1)
+    while ((opt = getopt(argc, argv, "+sh")) != -1)
         switch (opt) {
         case 's':
            opt_shell = true;
