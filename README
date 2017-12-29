@@ -1,0 +1,17 @@
+.. code:: console
+
+   $ netaway -h
+   Usage:
+     netaway COMMAND [ARG...]
+     netaway -s
+
+   Options:
+     -s  run the shell
+     -h  display this help and exit
+
+   $ netaway wget https://www.example.org/
+   --2017-12-29 19:17:44--  https://www.example.org/
+   Resolving www.example.org (www.example.org)... failed: Temporary failure in name resolution.
+   wget: unable to resolve host address ‘www.example.org’
+
+.. vim:ft=rst ts=3 sts=3 sw=3 et
