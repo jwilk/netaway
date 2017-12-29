@@ -1,0 +1,19 @@
+dist: trusty
+sudo: required
+language: c
+compiler:
+- clang
+- gcc
+addons:
+  apt:
+    packages:
+    - python-docutils
+    - python-pygments
+script:
+- make
+- make install PREFIX=$HOME/.local
+- export PATH=~/.local/bin:"$PATH"
+- netaway -h
+- netaway wget https://www.example.org/; [ $? -eq 4 ]
+
+# vim:ts=2 sts=2 sw=2 et
