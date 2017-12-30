@@ -7,9 +7,11 @@ compiler:
 addons:
   apt:
     packages:
+    - cppcheck
     - python-docutils
     - python-pygments
 script:
+- cppcheck --error-exitcode=1 *.c
 - make
 - make install PREFIX=$HOME/.local
 - export PATH=~/.local/bin:"$PATH"
