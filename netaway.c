@@ -57,10 +57,8 @@ int main(int argc, char **argv)
         argv[0] = getenv("SHELL");
         if (argv[0] == NULL)
             argv[0] = "sh";
-    } else {
-        if (argc == 0)
-            bad_usage();
-    }
+    } else if (argc == 0)
+        bad_usage();
     int rc = unshare(CLONE_NEWNET);
     if (rc < 0) {
         if (errno == EPERM)
