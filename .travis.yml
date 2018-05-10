@@ -8,8 +8,11 @@ addons:
   apt:
     packages:
     - cppcheck
+install:
+- python -m pip install --user pygments restructuredtext-lint
 script:
 - cppcheck --error-exitcode=1 *.c
+- restructuredtext-lint --encoding=UTF-8 README
 - make
 - make install PREFIX=$HOME/.local
 - netaway -h
