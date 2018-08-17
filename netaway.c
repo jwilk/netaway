@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void show_usage(FILE *fp)
+static void show_usage(FILE *fp)
 {
     fprintf(fp,
         "Usage:\n"
@@ -25,7 +25,7 @@ void show_usage(FILE *fp)
     );
 }
 
-void bad_usage()
+static void bad_usage()
 {
    show_usage(stderr);
    exit(EXIT_FAILURE);
