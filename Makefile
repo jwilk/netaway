@@ -1,7 +1,6 @@
 # Copyright © 2017 Jakub Wilk <jwilk@jwilk.net>
 # SPDX-License-Identifier: MIT
 
-CC ?= gcc
 CFLAGS ?= -g -O2
 CFLAGS += -Wall -Wextra
 
