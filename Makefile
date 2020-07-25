@@ -22,7 +22,7 @@ netaway: netaway.c
 install: netaway
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m755 $(<) $(DESTDIR)$(PREFIX)/bin/$(<)
-	$(SUDO) setcap cap_sys_admin+ep $(DESTDIR)$(PREFIX)/bin/$(<)
+	$(SUDO) setcap cap_sys_admin,cap_net_admin+ep $(DESTDIR)$(PREFIX)/bin/$(<)
 
 .PHONY: clean
 clean:

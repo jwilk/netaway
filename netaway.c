@@ -6,10 +6,13 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <net/if.h>
 #include <sched.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 static void show_usage(FILE *fp)
@@ -29,6 +32,33 @@ static void bad_usage()
 {
    show_usage(stderr);
    exit(EXIT_FAILURE);
+}
+
+void set_if_up(const char *ifname)
+{
+    struct ifreq ifreq;
+    strcpy(ifreq.ifr_name, ifname);
+    int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        perror("netaway: socket()");
+        exit(EXIT_FAILURE);
+    }
+    int rc = ioctl(fd, SIOCGIFFLAGS, &ifreq);
+    if (rc < 0) {
+        perror("netaway: ioctl(..., SIOCGIFFLAGS, ...)");
+        exit(EXIT_FAILURE);
+    }
+    ifreq.ifr_flags |= IFF_UP;
+    rc = ioctl(fd, SIOCSIFFLAGS, &ifreq);
+    if (rc < 0) {
+        perror("netaway: ioctl(..., SIOCSIFFLAGS, ...)");
+        exit(EXIT_FAILURE);
+    }
+    rc = close(fd);
+    if (rc < 0) {
+        perror("netaway: close()");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, char **argv)
@@ -67,6 +97,7 @@ int main(int argc, char **argv)
             perror("netaway: unshare()");
         exit(EXIT_FAILURE);
     }
+    set_if_up("lo");
     execvp(argv[0], argv);
     fprintf(stderr, "netaway: ");
     perror(argv[0]);
