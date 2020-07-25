@@ -30,8 +30,8 @@ static void show_usage(FILE *fp)
 
 static void bad_usage()
 {
-   show_usage(stderr);
-   exit(EXIT_FAILURE);
+    show_usage(stderr);
+    exit(EXIT_FAILURE);
 }
 
 void set_if_up(const char *ifname)
@@ -68,13 +68,13 @@ int main(int argc, char **argv)
     while ((opt = getopt(argc, argv, "+sh")) != -1)
         switch (opt) {
         case 's':
-           opt_shell = true;
-           break;
+            opt_shell = true;
+            break;
         case 'h':
-           show_usage(stdout);
-           exit(EXIT_SUCCESS);
+            show_usage(stdout);
+            exit(EXIT_SUCCESS);
         default:
-           bad_usage();
+            bad_usage();
         }
     assert(optind <= argc);
     argc -= optind;
