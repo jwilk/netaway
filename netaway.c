@@ -35,31 +35,32 @@ static void bad_usage()
     exit(EXIT_FAILURE);
 }
 
+void fatal(const char *context)
+{
+    int orig_errno = errno;
+    fprintf(stderr, "netaway: ");
+    errno = orig_errno;
+    perror(context);
+    exit(EXIT_FAILURE);
+}
+
 void set_if_up(const char *ifname)
 {
     struct ifreq ifreq;
     strcpy(ifreq.ifr_name, ifname);
     int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        perror("netaway: socket()");
-        exit(EXIT_FAILURE);
-    }
+    if (fd < 0)
+        fatal("socket()");
     int rc = ioctl(fd, SIOCGIFFLAGS, &ifreq);
-    if (rc < 0) {
-        perror("netaway: ioctl(..., SIOCGIFFLAGS, ...)");
-        exit(EXIT_FAILURE);
-    }
+    if (rc < 0)
+        fatal("ioctl(..., SIOCGIFFLAGS, ...)");
     ifreq.ifr_flags |= IFF_UP;
     rc = ioctl(fd, SIOCSIFFLAGS, &ifreq);
-    if (rc < 0) {
-        perror("netaway: ioctl(..., SIOCSIFFLAGS, ...)");
-        exit(EXIT_FAILURE);
-    }
+    if (rc < 0)
+        fatal("ioctl(..., SIOCSIFFLAGS, ...)");
     rc = close(fd);
-    if (rc < 0) {
-        perror("netaway: close()");
-        exit(EXIT_FAILURE);
-    }
+    if (rc < 0)
+        fatal("close()");
 }
 
 int main(int argc, char **argv)
@@ -95,14 +96,12 @@ int main(int argc, char **argv)
         if (errno == EPERM)
             fprintf(stderr, "netaway: CAP_SYS_ADMIN capability is required\n");
         else
-            perror("netaway: unshare()");
+            fatal("unshare()");
         exit(EXIT_FAILURE);
     }
     set_if_up("lo");
     execvp(argv[0], argv);
-    fprintf(stderr, "netaway: ");
-    perror(argv[0]);
-    exit(EXIT_FAILURE);
+    fatal(argv[0]);
 }
 
 /* vim:set ts=4 sts=4 sw=4 et:*/
