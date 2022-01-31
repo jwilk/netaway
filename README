@@ -2,10 +2,11 @@
 
    $ netaway -h
    Usage:
-     netaway COMMAND [ARG...]
-     netaway -s
+     netaway [-u] COMMAND [ARG...]
+     netaway [-u] -s
 
    Options:
+     -u  create new user namespace
      -s  run the shell
      -h  display this help and exit
 

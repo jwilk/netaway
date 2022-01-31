@@ -6,8 +6,10 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <net/if.h>
 #include <sched.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,10 +22,11 @@ static void show_usage(FILE *fp)
 {
     fprintf(fp,
         "Usage:\n"
-        "  netaway COMMAND [ARG...]\n"
-        "  netaway -s\n"
+        "  netaway [-u] COMMAND [ARG...]\n"
+        "  netaway [-u] -s\n"
         "\n"
         "Options:\n"
+        "  -u  create new user namespace\n"
         "  -s  run the shell\n"
         "  -h  display this help and exit\n"
     );
@@ -63,12 +66,32 @@ void set_if_up(const char *ifname)
         fatal("close()");
 }
 
+void pprintf(const char *path, const char *fmt, ...)
+{
+    int fd = open(path, O_WRONLY);
+    if (fd < 0)
+        fatal(path);
+    va_list ap;
+    va_start(ap, fmt);
+    int rc = vdprintf(fd, fmt, ap);
+    if (rc < 0)
+        fatal(path);
+    va_end(ap);
+    rc = close(fd);
+    if (rc < 0)
+        fatal(path);
+}
+
 int main(int argc, char **argv)
 {
     int opt;
     bool opt_shell = false;
-    while ((opt = getopt(argc, argv, "+sh")) != -1)
+    int unshare_flags = CLONE_NEWNET;
+    while ((opt = getopt(argc, argv, "+ush")) != -1)
         switch (opt) {
+        case 'u':
+            unshare_flags |= CLONE_NEWUSER;
+            break;
         case 's':
             opt_shell = true;
             break;
@@ -91,13 +114,20 @@ int main(int argc, char **argv)
             argv[0] = "sh";
     } else if (argc == 0)
         bad_usage();
-    int rc = unshare(CLONE_NEWNET);
+    int uid = geteuid();
+    int gid = getegid();
+    int rc = unshare(unshare_flags);
     if (rc < 0) {
         if (errno == EPERM)
             fprintf(stderr, "netaway: CAP_SYS_ADMIN capability is required\n");
         else
             fatal("unshare()");
         exit(EXIT_FAILURE);
+    }
+    if (unshare_flags & CLONE_NEWUSER) {
+        pprintf("/proc/self/uid_map", "%d %d 1", uid, uid);
+        pprintf("/proc/self/setgroups", "deny");
+        pprintf("/proc/self/gid_map", "%d %d 1", gid, gid);
     }
     set_if_up("lo");
     execvp(argv[0], argv);
