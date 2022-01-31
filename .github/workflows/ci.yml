@@ -1,0 +1,53 @@
+name: CI
+on:
+- push
+- pull_request
+jobs:
+  main:
+    strategy:
+      matrix:
+        os:
+        - ubuntu-18.04
+        - ubuntu-20.04
+        cc:
+        - gcc
+        - clang
+    runs-on: ${{matrix.os}}
+    steps:
+    - uses: actions/checkout@v2
+    - name: run cppcheck
+      if: matrix.cc == 'gcc'
+      run: |
+        sudo apt-get install cppcheck
+        cppcheck --error-exitcode=1 *.c
+    - name: check C compiler version
+      run: ${{matrix.cc}} --version
+    - name: build
+      run:
+        make CC=${{matrix.cc}}
+    - name: prove
+      run:
+        prove -v
+    - name: install
+      run:
+        make install PREFIX=$HOME/.local
+    - name: run online test (CAP_SYS_ADMIN)
+      run: |
+        cd /
+        set +e
+        netaway wget https://www.example.org/
+        [ $? -eq 4 ] || exit 1
+    - name: run online test (CLONE_NEWNET)
+      run: |
+        cd /
+        sudo setcap -r $(command -v netaway)
+        set +e
+        netaway -u wget https://www.example.org/
+        [ $? -eq 4 ] || exit 1
+    - name: check README syntax
+      if: matrix.os != 'ubuntu-18.04'
+      run: |
+        python3 -m pip install pygments restructuredtext-lint
+        rst-lint --level=info --encoding=UTF-8 README
+
+# vim:ts=2 sts=2 sw=2 et
