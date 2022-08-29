@@ -38,7 +38,7 @@ static void bad_usage()
     exit(EXIT_FAILURE);
 }
 
-void fatal(const char *context)
+static void fatal(const char *context)
 {
     int orig_errno = errno;
     fprintf(stderr, "netaway: ");
@@ -47,7 +47,7 @@ void fatal(const char *context)
     exit(EXIT_FAILURE);
 }
 
-void set_if_up(const char *ifname)
+static void set_if_up(const char *ifname)
 {
     struct ifreq ifreq;
     strcpy(ifreq.ifr_name, ifname);
@@ -66,7 +66,7 @@ void set_if_up(const char *ifname)
         fatal("close()");
 }
 
-void pprintf(const char *path, const char *fmt, ...)
+static void pprintf(const char *path, const char *fmt, ...)
 {
     int fd = open(path, O_WRONLY);
     if (fd < 0)
