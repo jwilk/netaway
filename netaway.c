@@ -28,7 +28,7 @@ static void show_usage(FILE *fp)
         "Options:\n"
         "  -u  create new user namespace\n"
         "  -s  run the shell\n"
-        "  -h  display this help and exit\n"
+        "  -h  show this help message and exit\n"
     );
 }
 
