@@ -114,8 +114,8 @@ int main(int argc, char **argv)
             argv[0] = "sh";
     } else if (argc == 0)
         bad_usage();
-    int uid = geteuid();
-    int gid = getegid();
+    unsigned int uid = geteuid();
+    unsigned int gid = getegid();
     int rc = unshare(unshare_flags);
     if (rc < 0) {
         if (errno == EPERM)
@@ -125,9 +125,9 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     if (unshare_flags & CLONE_NEWUSER) {
-        pprintf("/proc/self/uid_map", "%d %d 1", uid, uid);
+        pprintf("/proc/self/uid_map", "%u %u 1", uid, uid);
         pprintf("/proc/self/setgroups", "deny");
-        pprintf("/proc/self/gid_map", "%d %d 1", gid, gid);
+        pprintf("/proc/self/gid_map", "%u %u 1", gid, gid);
     }
     set_if_up("lo");
     execvp(argv[0], argv);
