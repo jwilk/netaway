@@ -40,6 +40,10 @@ jobs:
         set +e
         netaway wget https://www.example.org/
         [ $? -eq 4 ] || exit 1
+    - name: enable unprivileged user namespaces
+      if: matrix.os == 'ubuntu-24.04'
+      run: |
+        sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
     - name: run online test (CLONE_NEWNET)
       run: |
         cd /
